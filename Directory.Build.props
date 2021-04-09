@@ -1,0 +1,17 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>9</LangVersion>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <Description>A server-side implementation of Language Server Protocol to resolve Avalonia features from MSBuild Project File for previewer.</Description>
+    <Authors>AvaloniaPreviewLanguageServer Contributors</Authors>
+    <Company>AvaloniaPreviewLanguageServer Contributors</Company>
+    <Copyright>Copyright (c) 2021 AvaloniaPreviewLanguageServer Contributors</Copyright>
+  </PropertyGroup>
+
+</Project>
