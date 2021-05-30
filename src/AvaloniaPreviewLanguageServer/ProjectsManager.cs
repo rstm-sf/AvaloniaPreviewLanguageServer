@@ -26,33 +26,43 @@ namespace AvaloniaPreviewLanguageServer
         public async Task UpdateProjectAsync(string projectPath)
         {
             projectPath = projectPath.Replace('\\', '/');
-            var result = await _resolver.ResolvePreviewProjectInfoAsync(projectPath);
+            if (_buffers.ContainsKey(projectPath))
+                return;
+
+            var result = await _resolver.ResolvePreviewInfoAsync(projectPath);
             if (result.HasError)
             {
                 return;
             }
 
-            var directoryPath = GetDirectoryPath(projectPath);
+            AddPreviewInfoToBuffer(result.PreviewInfo!, result.PreviewInfo!.XamlFileInfo);
+            foreach (var xamlFileInfo in result.PreviewInfo.XamlFileInfo.ReferenceXamlFileInfoCollection)
+                AddPreviewInfoToBuffer(result.PreviewInfo!, xamlFileInfo);
+        }
 
-            var projectInfo = result.ProjectInfo!;
-            var xamlResourcesFilePaths = projectInfo.AvaloniaResource
+        private void AddPreviewInfoToBuffer(PreviewInfo previewInfo, XamlFileInfo xamlFileInfo)
+        {
+            var directoryPath = Path.GetDirectoryName(xamlFileInfo.ProjectPath)!;
+
+            var xamlResourcesFilePaths = xamlFileInfo.AvaloniaResource
                 .Split(';')
                 .Select(x => GetResourcePath(directoryPath, x))
                 .ToList();
 
             xamlResourcesFilePaths.AddRange(
-                projectInfo.AvaloniaXaml
+                xamlFileInfo.AvaloniaXaml
                     .Split(';')
                     .Select(x => GetResourcePath(directoryPath, x)));
 
             var previewParameters = new PreviewParameters(
-                projectInfo.AvaloniaPreviewerNetCoreToolPath,
-                projectInfo.ProjectInfoByTfmArray[0].TargetPath,
-                projectInfo.ProjectInfoByTfmArray[0].ProjectDepsFilePath,
-                projectInfo.ProjectInfoByTfmArray[0].ProjectRuntimeConfigFilePath);
+                previewInfo.AvaloniaPreviewerNetCoreToolPath,
+                previewInfo.AppExecInfoCollection[0].TargetPath,
+                previewInfo.AppExecInfoCollection[0].ProjectDepsFilePath,
+                previewInfo.AppExecInfoCollection[0].ProjectRuntimeConfigFilePath);
 
             var value = (xamlResourcesFilePaths.ToArray(), previewParameters);
-            _buffers.AddOrUpdate(projectPath, value, (_, _) => value);
+            var path = xamlFileInfo.ProjectPath.Replace('\\', '/');
+            _buffers.AddOrUpdate(path, value, (_, _) => value);
         }
 
         public bool TryGetPreviewParameters(string filePath, [NotNullWhen(true)] out PreviewParameters? parameters)
@@ -72,20 +82,6 @@ namespace AvaloniaPreviewLanguageServer
             }
 
             return false;
-        }
-
-        private static string GetDirectoryPath(string path)
-        {
-            var span = path.AsSpan();
-            for (var i = span.Length - 1; i >= 0; --i)
-            {
-                if (span[i] == '/')
-                {
-                    return span[..i].ToString();
-                }
-            }
-
-            return string.Empty;
         }
 
         private static string GetResourcePath(string directoryPath, string relFilePath) =>
