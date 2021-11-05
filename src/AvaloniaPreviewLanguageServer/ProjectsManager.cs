@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,13 @@ using AvaloniaProjectInfoResolver;
 
 namespace AvaloniaPreviewLanguageServer
 {
+    public record PreviewParameters(
+        string AvaloniaPreviewPath,
+        string TargetPath,
+        string ProjectDepsFilePath,
+        string ProjectRuntimeConfigFilePath,
+        string XamlFilePath = "");
+
     public class ProjectsManager
     {
         private readonly ConcurrentDictionary<string, (string[] resourcePaths, PreviewParameters previewParameters)>
@@ -47,7 +55,7 @@ namespace AvaloniaPreviewLanguageServer
             _buffers.AddOrUpdate(projectPath, value, (_, _) => value);
         }
 
-        public bool TryGetPreviewParameters(string filePath, out PreviewParameters? parameters)
+        public bool TryGetPreviewParameters(string filePath, [NotNullWhen(true)] out PreviewParameters? parameters)
         {
             parameters = default;
             filePath = filePath.Replace('\\', '/');
