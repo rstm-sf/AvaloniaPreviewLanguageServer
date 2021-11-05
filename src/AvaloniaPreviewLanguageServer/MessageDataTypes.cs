@@ -4,10 +4,5 @@ using Newtonsoft.Json.Serialization;
 namespace AvaloniaPreviewLanguageServer
 {
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-    public record PreviewParameters(
-        string AvaloniaPreviewPath,
-        string TargetPath,
-        string ProjectDepsFilePath,
-        string ProjectRuntimeConfigFilePath,
-        string XamlFilePath = "");
+    public record StartPreviewMessage(string HtmlUrl, string XamlFilePath);
 }
