@@ -10,8 +10,15 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="AvaloniaProjectInfoResolver" Version="0.0.1-alpha" />
+    <PackageReference Include="AvaloniaProjectInfoResolver" Version="0.0.2-alpha" />
     <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.5" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <RestoreSources>
+      https://api.nuget.org/v3/index.json;
+      ../../../../../../nugets/
+    </RestoreSources>
+  </PropertyGroup>
 
 </Project>
