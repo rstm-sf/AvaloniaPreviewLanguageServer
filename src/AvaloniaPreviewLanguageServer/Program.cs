@@ -31,7 +31,7 @@ namespace AvaloniaPreviewLanguageServer
                             return;
                         }
 
-                        var manager = languageServer.GetService<ProjectsManager>();
+                        var manager = languageServer.GetService<ProjectsManager>()!;
                         foreach (var folder in folders)
                         {
                             var folderPath = folder.Uri.GetFileSystemPath();
